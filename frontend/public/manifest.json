@@ -1,0 +1,15 @@
+{
+  "name": "ISHAS Organization Management System",
+  "short_name": "ISHAS",
+  "description": "সদস্য, তহবিল, মিটিং ও ইভেন্ট ব্যবস্থাপনার সম্পূর্ণ ডিজিটাল সমাধান",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5",
+  "lang": "bn",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

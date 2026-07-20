@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-body bg-slate-50 text-slate-800 antialiased;
+    @apply dark:bg-slate-950 dark:text-slate-100;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+
+  ::selection {
+    @apply bg-primary-500/30;
+  }
+
+  /* Visible keyboard focus everywhere — accessibility floor */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-white dark:ring-offset-slate-950;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-surface-light dark:bg-surface-dark backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-glass dark:shadow-glass-dark rounded-xl2;
+  }
+
+  .btn-gradient {
+    @apply bg-gradient-brand text-white font-semibold rounded-xl px-6 py-3 shadow-glow transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-medium rounded-xl px-6 py-3 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800;
+  }
+
+  .input-field {
+    @apply w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 px-4 py-3 text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:border-primary-500 transition-colors;
+  }
+
+  .field-label {
+    @apply block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1.5;
+  }
+
+  .field-error {
+    @apply mt-1 text-xs text-danger;
+  }
+}
+
+/* Signature element: soft animated aurora mesh used behind auth screens */
+.aurora-bg {
+  @apply absolute inset-0 -z-10 bg-gradient-aurora bg-slate-50 dark:bg-slate-950;
+}
+
+.aurora-bg::before {
+  content: '';
+  position: absolute;
+  inset: -10%;
+  background: inherit;
+  filter: blur(60px);
+  animation: aurora 14s ease-in-out infinite;
+}

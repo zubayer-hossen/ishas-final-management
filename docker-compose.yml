@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: ishas-mongo
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - ishas_mongo_data:/data/db
+    networks:
+      - ishas-network
+
+  backend:
+    build:
+      context: ./backend
+    container_name: ishas-backend
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    ports:
+      - '5000:5000'
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      CLIENT_URL: http://localhost
+      MONGO_URI: mongodb://mongo:27017/ishas_organization
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-change_this_access_secret}
+      JWT_ACCESS_EXPIRES: 15m
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-change_this_refresh_secret}
+      JWT_REFRESH_EXPIRES: 30d
+      COOKIE_SECRET: ${COOKIE_SECRET:-change_this_cookie_secret}
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      EMAIL_FROM_NAME: ${EMAIL_FROM_NAME:-ISHAS Organization}
+      EMAIL_FROM_ADDRESS: ${EMAIL_FROM_ADDRESS:-}
+      OTP_EXPIRES_MINUTES: 10
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:-}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:-}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-}
+      RATE_LIMIT_WINDOW_MINUTES: 15
+      RATE_LIMIT_MAX: 100
+      OWNER_NAME: ${OWNER_NAME:-System Owner}
+      OWNER_EMAIL: ${OWNER_EMAIL:-owner@ishas.org}
+      OWNER_PASSWORD: ${OWNER_PASSWORD:-ChangeMe@12345}
+    volumes:
+      - ishas_backend_uploads:/app/uploads
+      - ishas_backend_logs:/app/logs
+    networks:
+      - ishas-network
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: /api/v1
+        VITE_SOCKET_URL: ''
+    container_name: ishas-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - '80:80'
+    networks:
+      - ishas-network
+
+networks:
+  ishas-network:
+    driver: bridge
+
+volumes:
+  ishas_mongo_data:
+  ishas_backend_uploads:
+  ishas_backend_logs:
