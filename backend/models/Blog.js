@@ -46,10 +46,10 @@ BlogSchema.index({ tags: 1 });
 BlogSchema.index({ title: 'text', content: 'text', tags: 'text' });
 
 BlogSchema.virtual('likeCount').get(function () {
-  return this.likes.length;
+  return this.likes?.length || 0;
 });
 BlogSchema.virtual('commentCount').get(function () {
-  return this.comments.length;
+  return this.comments?.length || 0;
 });
 BlogSchema.set('toJSON', { virtuals: true });
 BlogSchema.set('toObject', { virtuals: true });

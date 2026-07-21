@@ -55,7 +55,7 @@ const createNotice = asyncHandler(async (req, res) => {
           title: 'নতুন নোটিশ',
           message: notice.title,
           type: notice.category === 'urgent' ? 'alert' : 'info',
-          link: `/notices/${notice._id}`,
+          link: `/dashboard/notices`,
           relatedType: 'notice',
           relatedId: notice._id,
         }

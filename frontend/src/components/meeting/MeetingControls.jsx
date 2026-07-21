@@ -48,6 +48,7 @@ const MeetingControls = ({
     <ControlButton active={!handRaised} onClick={onToggleHand} label="হাত তোলা">
       <FiThumbsUp size={18} className={handRaised ? "text-warning" : ""} />
     </ControlButton>
+
     <ControlButton active onClick={onToggleChat} label="চ্যাট">
       <FiMessageSquare size={18} />
     </ControlButton>

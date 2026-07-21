@@ -41,6 +41,7 @@ const ADMIN_NAV_ITEMS = [
   { to: '/dashboard/admin/events', label: 'ইভেন্ট পরিচালনা', icon: FiCalendar },
   { to: '/dashboard/admin/blogs', label: 'ব্লগ পরিচালনা', icon: FiFileText },
   { to: '/dashboard/admin/gallery', label: 'গ্যালারি পরিচালনা', icon: FiImage },
+  { to: '/dashboard/admin/tickets', label: 'সাপোর্ট টিকেট', icon: FiHelpCircle, roles: ['owner', 'super_admin', 'admin'] },
   { to: '/dashboard/admin/reports', label: 'রিপোর্ট', icon: FiDownload },
   { to: '/dashboard/admin/settings', label: 'সেটিংস', icon: FiSettings, roles: ['owner'] },
 ];

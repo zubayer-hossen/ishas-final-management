@@ -7,8 +7,19 @@ const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const env = require('../config/env');
 
+const allowedOrigins = (env.clientUrl || '')
+  .split(',')
+  .map((url) => url.trim())
+  .filter(Boolean);
+
 const corsOptions = {
-  origin: env.clientUrl,
+  origin: (origin, callback) => {
+    // Allow non-browser requests (no Origin header) e.g. curl, server-to-server, mobile apps
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS নীতি অনুযায়ী এই origin (${origin}) থেকে অনুরোধ গ্রহণযোগ্য নয়`));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
 };

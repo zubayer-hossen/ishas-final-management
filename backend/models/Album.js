@@ -40,7 +40,7 @@ const AlbumSchema = new mongoose.Schema(
 AlbumSchema.index({ createdAt: -1 });
 
 AlbumSchema.virtual('imageCount').get(function () {
-  return this.images.length;
+  return this.images?.length || 0;
 });
 AlbumSchema.set('toJSON', { virtuals: true });
 AlbumSchema.set('toObject', { virtuals: true });

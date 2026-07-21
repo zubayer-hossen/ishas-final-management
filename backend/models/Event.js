@@ -45,7 +45,7 @@ EventSchema.index({ startDate: 1 });
 EventSchema.index({ category: 1 });
 
 EventSchema.virtual('participantCount').get(function () {
-  return this.registrations.length;
+  return this.registrations?.length || 0;
 });
 
 EventSchema.set('toJSON', { virtuals: true });

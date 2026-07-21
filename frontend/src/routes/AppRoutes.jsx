@@ -34,6 +34,7 @@ import NoticeManagementPage from '../pages/admin/NoticeManagementPage';
 import EventManagementPage from '../pages/admin/EventManagementPage';
 import BlogManagementPage from '../pages/admin/BlogManagementPage';
 import GalleryManagementPage from '../pages/admin/GalleryManagementPage';
+import TicketManagementPage from '../pages/admin/TicketManagementPage';
 import ReportsPage from '../pages/admin/ReportsPage';
 import OrgSettingsPage from '../pages/admin/OrgSettingsPage';
 import { ADMIN_ACCESS_ROLES, FINANCE_ROLES } from '../utils/roles';
@@ -94,6 +95,7 @@ const AppRoutes = () => (
 
         <Route element={<ProtectedRoute allowedRoles={['owner', 'super_admin', 'admin']} />}>
           <Route path="/dashboard/admin/members" element={<MembersManagementPage />} />
+          <Route path="/dashboard/admin/tickets" element={<TicketManagementPage />} />
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={FINANCE_ROLES} />}>

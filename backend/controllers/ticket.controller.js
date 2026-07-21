@@ -1,10 +1,11 @@
 const Ticket = require('../models/Ticket');
+const User = require('../models/User');
 const asyncHandler = require('../utils/asyncHandler');
 const ApiError = require('../utils/ApiError');
 const ApiResponse = require('../utils/ApiResponse');
 const { getPagination, buildPaginationMeta } = require('../utils/pagination');
 const generateTicketNumber = require('../utils/generateTicketNumber');
-const { notifyUser } = require('../utils/notify');
+const { notifyUser, notifyManyUsers } = require('../utils/notify');
 
 const STAFF_ROLES = ['owner', 'super_admin', 'admin'];
 
@@ -25,6 +26,24 @@ const createTicket = asyncHandler(async (req, res) => {
     priority,
     createdBy: req.user._id,
   });
+
+  User.find({ role: { $in: STAFF_ROLES }, isActive: true })
+    .select('_id')
+    .then((staff) =>
+      notifyManyUsers(
+        req.app.get('io'),
+        staff.map((s) => s._id.toString()),
+        {
+          title: 'নতুন সাপোর্ট টিকেট',
+          message: `${req.user.fullName} একটি নতুন টিকেট জমা দিয়েছেন: ${subject}`,
+          type: 'info',
+          link: `/dashboard/support/tickets/${ticket._id}`,
+          relatedType: 'ticket',
+          relatedId: ticket._id,
+        }
+      )
+    )
+    .catch(() => null);
 
   return res.status(201).json(new ApiResponse(201, ticket, 'টিকেট সফলভাবে জমা দেওয়া হয়েছে'));
 });
@@ -120,7 +139,7 @@ const addReply = asyncHandler(async (req, res) => {
       title: 'আপনার টিকেটে নতুন উত্তর',
       message: `টিকেট #${ticket.ticketNumber} এ একটি নতুন উত্তর যুক্ত হয়েছে`,
       type: 'info',
-      link: `/support/tickets/${ticket._id}`,
+      link: `/dashboard/support/tickets/${ticket._id}`,
       relatedType: 'ticket',
       relatedId: ticket._id,
     }).catch(() => null);
@@ -148,7 +167,7 @@ const updateTicketStatus = asyncHandler(async (req, res) => {
     title: 'টিকেটের স্ট্যাটাস পরিবর্তন হয়েছে',
     message: `টিকেট #${ticket.ticketNumber} এখন "${status}" অবস্থায় আছে`,
     type: status === 'resolved' ? 'success' : 'info',
-    link: `/support/tickets/${ticket._id}`,
+    link: `/dashboard/support/tickets/${ticket._id}`,
     relatedType: 'ticket',
     relatedId: ticket._id,
   }).catch(() => null);
