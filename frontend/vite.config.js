@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  base: '/', // <-- এই লাইনটি অবশ্যই রাখুন
   server: {
     port: 5173,
     proxy: {
