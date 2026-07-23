@@ -11,6 +11,7 @@ const {
   generateSecureToken,
 } = require('../utils/token');
 const sendEmail = require('../utils/sendEmail');
+const logger = require('../utils/logger');
 const otpEmail = require('../templates/emails/otpEmail');
 const resetPasswordEmail = require('../templates/emails/resetPasswordEmail');
 const env = require('../config/env');
@@ -23,10 +24,38 @@ const LOCK_TIME_MS = 15 * 60 * 1000; // 15 minutes
 
 const cookieOptions = (maxAgeMs) => ({
   httpOnly: true,
+  // Cross-origin deployments (e.g. Netlify frontend + Render backend) require
+  // SameSite=None so the browser sends the cookie on cross-site requests.
+  // SameSite=None is only honored by browsers when Secure=true (HTTPS),
+  // which is why this is tied to production rather than a separate flag.
   secure: env.nodeEnv === 'production',
-  sameSite: 'strict',
+  sameSite: env.nodeEnv === 'production' ? 'none' : 'lax',
   maxAge: maxAgeMs,
 });
+
+// clearCookie must be called with the same sameSite/secure attributes the
+// cookie was originally set with, or some browsers will silently keep it.
+const clearCookieOptions = () => ({
+  httpOnly: true,
+  secure: env.nodeEnv === 'production',
+  sameSite: env.nodeEnv === 'production' ? 'none' : 'lax',
+});
+
+/**
+ * Sends an email but converts any SMTP/transport failure into a clear,
+ * user-facing ApiError instead of letting it bubble up as an opaque 500.
+ * The caller's DB changes (e.g. the created user, the OTP hash) are
+ * already committed by this point, so the person can safely retry via
+ * "resend OTP" once the SMTP issue is fixed.
+ */
+const sendEmailSafely = async (options, failureMessage) => {
+  try {
+    await sendEmail(options);
+  } catch (error) {
+    logger.error(`Email send failed (${options.subject}) to ${options.to}: ${error.message}`);
+    throw ApiError.internal(failureMessage || 'ইমেইল পাঠাতে ব্যর্থ হয়েছে। একটু পর আবার চেষ্টা করুন।');
+  }
+};
 
 const parseExpiryToMs = (expiryStr, fallbackMs) => {
   const match = /^(\d+)([smhd])$/.exec(expiryStr || '');
@@ -85,7 +114,7 @@ const register = asyncHandler(async (req, res) => {
     emailOtpExpires: new Date(Date.now() + env.otpExpiresMinutes * 60 * 1000),
   });
 
-  await sendEmail({
+  await sendEmailSafely({
     to: user.email,
     subject: 'আপনার ইমেইল ভেরিফাই করুন — ISHAS Organization',
     html: otpEmail({ name: user.fullName, otp, minutes: env.otpExpiresMinutes }),
@@ -149,7 +178,7 @@ const resendOtp = asyncHandler(async (req, res) => {
   user.emailOtpExpires = new Date(Date.now() + env.otpExpiresMinutes * 60 * 1000);
   await user.save({ validateBeforeSave: false });
 
-  await sendEmail({
+  await sendEmailSafely({
     to: user.email,
     subject: 'নতুন OTP কোড — ISHAS Organization',
     html: otpEmail({ name: user.fullName, otp, minutes: env.otpExpiresMinutes }),
@@ -268,8 +297,8 @@ const logout = asyncHandler(async (req, res) => {
     await req.user.save({ validateBeforeSave: false });
   }
 
-  res.clearCookie(ACCESS_COOKIE_NAME);
-  res.clearCookie(REFRESH_COOKIE_NAME);
+  res.clearCookie(ACCESS_COOKIE_NAME, clearCookieOptions());
+  res.clearCookie(REFRESH_COOKIE_NAME, clearCookieOptions());
 
   return res.status(200).json(new ApiResponse(200, null, 'লগআউট সফল হয়েছে'));
 });
@@ -282,8 +311,8 @@ const logoutAllDevices = asyncHandler(async (req, res) => {
   req.user.tokenVersion += 1;
   await req.user.save({ validateBeforeSave: false });
 
-  res.clearCookie(ACCESS_COOKIE_NAME);
-  res.clearCookie(REFRESH_COOKIE_NAME);
+  res.clearCookie(ACCESS_COOKIE_NAME, clearCookieOptions());
+  res.clearCookie(REFRESH_COOKIE_NAME, clearCookieOptions());
 
   return res.status(200).json(new ApiResponse(200, null, 'সব ডিভাইস থেকে লগআউট করা হয়েছে'));
 });
@@ -313,11 +342,15 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
   const resetUrl = `${env.clientUrl}/reset-password?token=${rawToken}&email=${encodeURIComponent(email)}`;
 
-  await sendEmail({
-    to: user.email,
-    subject: 'পাসওয়ার্ড রিসেট অনুরোধ — ISHAS Organization',
-    html: resetPasswordEmail({ name: user.fullName, resetUrl, minutes: env.otpExpiresMinutes }),
-  });
+  try {
+    await sendEmail({
+      to: user.email,
+      subject: 'পাসওয়ার্ড রিসেট অনুরোধ — ISHAS Organization',
+      html: resetPasswordEmail({ name: user.fullName, resetUrl, minutes: env.otpExpiresMinutes }),
+    });
+  } catch (error) {
+    logger.error(`Password reset email failed for ${user.email}: ${error.message}`);
+  }
 
   return res.status(200).json(genericResponse);
 });

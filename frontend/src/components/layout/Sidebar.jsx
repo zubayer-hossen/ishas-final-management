@@ -15,10 +15,14 @@ import {
   FiDownload,
   FiSettings,
   FiImage,
+  FiLogOut,
 } from 'react-icons/fi';
-import { useAppSelector } from '../../app/hooks';
+import toast from 'react-hot-toast';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import Logo from '../ui/Logo';
 import { ADMIN_ACCESS_ROLES } from '../../utils/roles';
+import { useLogoutMutation } from '../../features/auth/authApi';
+import { logout as logoutAction } from '../../features/auth/authSlice';
 
 const NAV_ITEMS = [
   { to: '/dashboard', label: 'হোম', icon: FiHome, end: true },
@@ -48,6 +52,19 @@ const ADMIN_NAV_ITEMS = [
 
 const Sidebar = ({ isOpen, onClose }) => {
   const user = useAppSelector((state) => state.auth.user);
+  const dispatch = useAppDispatch();
+  const [logoutApi] = useLogoutMutation();
+
+  const handleLogout = async () => {
+    try {
+      await logoutApi().unwrap();
+    } catch {
+      // Even if the server call fails (e.g. token already expired),
+      // clear the local session so the person isn't stuck.
+    }
+    dispatch(logoutAction());
+    toast.success('লগআউট সফল হয়েছে');
+  };
 
   return (
     <>
@@ -122,10 +139,18 @@ const Sidebar = ({ isOpen, onClose }) => {
               alt={user?.fullName}
               className="w-9 h-9 rounded-full object-cover"
             />
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate">{user?.fullName}</p>
               <p className="text-xs text-slate-400 truncate">{user?.memberId || user?.role}</p>
             </div>
+            <button
+              onClick={handleLogout}
+              className="text-slate-400 hover:text-danger transition-colors shrink-0 p-2"
+              title="লগআউট"
+              aria-label="লগআউট"
+            >
+              <FiLogOut size={18} />
+            </button>
           </div>
         </div>
       </aside>

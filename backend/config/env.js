@@ -23,7 +23,17 @@ if (missing.length > 0) {
 module.exports = {
   nodeEnv: process.env.NODE_ENV || 'development',
   port: process.env.PORT || 5000,
-  clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
+  // CLIENT_URL may be a comma-separated list (e.g. local dev + deployed
+  // frontend). clientUrls is the full list (used for CORS); clientUrl is
+  // just the first entry, used whenever a single canonical URL is needed
+  // to build a link (emails, PDF receipts, QR codes).
+  clientUrls: (process.env.CLIENT_URL || 'http://localhost:5173')
+    .split(',')
+    .map((url) => url.trim())
+    .filter(Boolean),
+  get clientUrl() {
+    return this.clientUrls[0];
+  },
   mongoUri: process.env.MONGO_URI,
 
   jwt: {
@@ -54,6 +64,6 @@ module.exports = {
 
   rateLimit: {
     windowMinutes: Number(process.env.RATE_LIMIT_WINDOW_MINUTES) || 15,
-    max: Number(process.env.RATE_LIMIT_MAX) || 100,
+    max: Number(process.env.RATE_LIMIT_MAX) || 500,
   },
 };

@@ -11,7 +11,7 @@ const {
 
 const router = express.Router();
 
-const FINANCE_ROLES = ['owner', 'super_admin', 'admin', 'treasurer'];
+const FINANCE_ROLES = ['treasurer'];
 
 // -------- Public route (QR verification) --------
 router.get('/verify/:transactionId', transactionController.verifyReceipt);

@@ -1,6 +1,7 @@
 import { FiMenu } from 'react-icons/fi';
 import ThemeToggle from '../ui/ThemeToggle';
 import NotificationBell from '../notifications/NotificationBell';
+import UserMenu from './UserMenu';
 
 const Topbar = ({ onMenuClick }) => (
   <header className="sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 py-4">
@@ -17,6 +18,7 @@ const Topbar = ({ onMenuClick }) => (
     <div className="flex items-center gap-3">
       <NotificationBell />
       <ThemeToggle />
+      <UserMenu />
     </div>
   </header>
 );

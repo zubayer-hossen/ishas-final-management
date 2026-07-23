@@ -7,10 +7,7 @@ const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const env = require('../config/env');
 
-const allowedOrigins = (env.clientUrl || '')
-  .split(',')
-  .map((url) => url.trim())
-  .filter(Boolean);
+const allowedOrigins = env.clientUrls;
 
 const corsOptions = {
   origin: (origin, callback) => {
@@ -38,7 +35,7 @@ const globalLimiter = rateLimit({
 // Stricter limiter specifically for auth endpoints (brute-force protection)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: 50,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
