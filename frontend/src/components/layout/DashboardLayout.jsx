@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
+import AnnouncementBar from '../dashboard/AnnouncementBar';
 import useNotificationSocket from '../../hooks/useNotificationSocket';
 
 const DashboardLayout = () => {
@@ -14,6 +15,7 @@ const DashboardLayout = () => {
 
       <div className="flex-1 min-w-0">
         <Topbar onMenuClick={() => setSidebarOpen(true)} />
+        <AnnouncementBar />
         <main className="px-4 sm:px-6 pb-10">
           <Outlet />
         </main>

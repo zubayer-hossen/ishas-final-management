@@ -20,7 +20,8 @@ import NoticesPage from '../pages/dashboard/NoticesPage';
 import EventsPage from '../pages/dashboard/EventsPage';
 import MeetingsPage from '../pages/dashboard/MeetingsPage';
 import MeetingRoomPage from '../pages/dashboard/MeetingRoomPage';
-import BlogsPage from '../pages/dashboard/BlogsPage';
+import BlogListPage from '../pages/blog/BlogListPage';
+import BlogDetailPage from '../pages/blog/BlogDetailPage';
 import GalleryPage from '../pages/dashboard/GalleryPage';
 import GalleryAlbumPage from '../pages/dashboard/GalleryAlbumPage';
 import SupportPage from '../pages/dashboard/SupportPage';
@@ -58,6 +59,8 @@ const RootRoute = () => {
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<RootRoute />} />
+    <Route path="/blog" element={<BlogListPage />} />
+    <Route path="/blog/:slug" element={<BlogDetailPage />} />
 
     <Route element={<PublicOnlyRoute />}>
       <Route path="/login" element={<LoginPage />} />
@@ -78,7 +81,6 @@ const AppRoutes = () => (
         <Route path="/dashboard/notices" element={<NoticesPage />} />
         <Route path="/dashboard/events" element={<EventsPage />} />
         <Route path="/dashboard/meetings" element={<MeetingsPage />} />
-        <Route path="/dashboard/blogs" element={<BlogsPage />} />
         <Route path="/dashboard/gallery" element={<GalleryPage />} />
         <Route path="/dashboard/gallery/:id" element={<GalleryAlbumPage />} />
         <Route path="/dashboard/support" element={<SupportPage />} />

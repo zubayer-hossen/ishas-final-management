@@ -75,3 +75,8 @@
   filter: blur(60px);
   animation: aurora 14s ease-in-out infinite;
 }
+
+/* Extra bottom padding on devices with a home-indicator/notch (iPhone etc.) */
+.safe-area-bottom {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}

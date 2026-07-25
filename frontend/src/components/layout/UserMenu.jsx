@@ -54,7 +54,7 @@ const UserMenu = () => {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-48 glass-card !rounded-xl p-1.5 z-50">
+        <div className="fixed left-3 right-3 top-16 sm:absolute sm:left-auto sm:top-auto sm:right-0 sm:mt-2 w-auto sm:w-48 glass-card !rounded-xl p-1.5 z-50">
           <Link
             to="/dashboard/profile"
             onClick={() => setOpen(false)}

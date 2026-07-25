@@ -64,16 +64,31 @@ const getAllBlogs = asyncHandler(async (req, res) => {
   const [blogs, total] = await Promise.all([
     Blog.find(filter)
       .populate('author', 'fullName profilePicture')
-      .select('-content -comments')
+      .select('-content')
       .sort(search ? { score: { $meta: 'textScore' } } : { publishedAt: -1, createdAt: -1 })
       .skip(skip)
       .limit(limit),
     Blog.countDocuments(filter),
   ]);
 
+  // Keep the comment *count* for the list view's card UI, but drop the full
+  // comments array itself (unnecessary bandwidth for a list of previews).
+  const blogsWithCommentCount = blogs.map((blog) => {
+    const obj = blog.toObject();
+    obj.commentCount = obj.comments?.length || 0;
+    delete obj.comments;
+    return obj;
+  });
+
   return res
     .status(200)
-    .json(new ApiResponse(200, { blogs, pagination: buildPaginationMeta(total, page, limit) }, 'ব্লগের তালিকা'));
+    .json(
+      new ApiResponse(
+        200,
+        { blogs: blogsWithCommentCount, pagination: buildPaginationMeta(total, page, limit) },
+        'ব্লগের তালিকা'
+      )
+    );
 });
 
 /**

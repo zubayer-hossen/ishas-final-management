@@ -1,5 +1,6 @@
 import { useEffect, useCallback } from 'react';
 import { FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { toBanglaDigits } from '../../utils/banglaDigits';
 
 const Lightbox = ({ images, index, onClose, onNavigate }) => {
   const goNext = useCallback(() => onNavigate((index + 1) % images.length), [index, images.length, onNavigate]);
@@ -22,7 +23,11 @@ const Lightbox = ({ images, index, onClose, onNavigate }) => {
   const current = images[index];
 
   return (
-    <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 animate-fade-in-up" onClick={onClose}>
+      <div className="absolute top-5 left-1/2 -translate-x-1/2 text-white/70 text-sm font-data tracking-wide">
+        {toBanglaDigits(index + 1)} / {toBanglaDigits(images.length)}
+      </div>
+
       <button onClick={onClose} className="absolute top-5 right-5 text-white/80 hover:text-white" aria-label="বন্ধ করুন">
         <FiX size={26} />
       </button>
@@ -39,10 +44,11 @@ const Lightbox = ({ images, index, onClose, onNavigate }) => {
       </button>
 
       <img
+        key={current._id}
         src={current.url}
         alt={current.caption || 'গ্যালারি ছবি'}
         onClick={(e) => e.stopPropagation()}
-        className="max-w-full max-h-[85vh] rounded-lg object-contain"
+        className="max-w-full max-h-[85vh] rounded-lg object-contain animate-fade-in-up"
       />
 
       <button

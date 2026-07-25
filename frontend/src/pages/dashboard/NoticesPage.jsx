@@ -38,31 +38,32 @@ const NoticesPage = () => {
           <div key={notice._id} className="glass-card overflow-hidden">
             <button
               onClick={() => setExpandedId(isOpen ? null : notice._id)}
-              className="w-full flex items-start justify-between gap-3 p-5 text-left"
+              className="w-full flex items-center justify-between gap-3 p-4 sm:p-5 text-left"
             >
-              <div className="min-w-0">
-                <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5 sm:gap-2 mb-1 flex-wrap">
                   {notice.isPinned && (
-                    <span className="text-[10px] font-bold bg-warning/15 text-warning px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] font-bold bg-warning/15 text-warning px-2 py-0.5 rounded-full shrink-0">
                       পিন করা
                     </span>
                   )}
-                  <span className="text-[10px] font-medium bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 px-2 py-0.5 rounded-full">
+                  <span className="text-[10px] font-medium bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 px-2 py-0.5 rounded-full shrink-0">
                     {CATEGORY_LABELS[notice.category] || notice.category}
                   </span>
                 </div>
-                <p className="font-semibold text-slate-800 dark:text-white">{notice.title}</p>
+                <p className="font-semibold text-slate-800 dark:text-white text-sm sm:text-base leading-snug">{notice.title}</p>
                 <p className="text-xs text-slate-400 mt-1">
                   {new Date(notice.createdAt).toLocaleDateString('bn-BD')}
                 </p>
               </div>
               <FiChevronDown
-                className={`shrink-0 mt-1 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                size={18}
+                className={`shrink-0 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
               />
             </button>
 
             {isOpen && (
-              <div className="px-5 pb-5 text-sm text-slate-600 dark:text-slate-300 whitespace-pre-line">
+              <div className="px-4 sm:px-5 pb-4 sm:pb-5 text-sm text-slate-600 dark:text-slate-300 whitespace-pre-line">
                 {notice.content}
 
                 {notice.attachments?.length > 0 && (

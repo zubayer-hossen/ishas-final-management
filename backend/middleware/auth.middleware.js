@@ -53,4 +53,33 @@ const requireActiveMembership = (req, res, next) => {
   next();
 };
 
-module.exports = { protect, authorize, requireActiveMembership };
+/**
+ * Like `protect`, but never rejects the request if no valid token is
+ * present — it simply proceeds without req.user. Used for public-facing
+ * routes (e.g. reading published blog posts) that behave slightly
+ * differently for logged-in staff (e.g. seeing drafts) without requiring
+ * everyone to be authenticated just to read.
+ */
+const optionalAuth = asyncHandler(async (req, res, next) => {
+  let token;
+
+  if (req.headers.authorization?.startsWith('Bearer ')) {
+    token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies?.accessToken) {
+    token = req.cookies.accessToken;
+  }
+
+  if (!token) return next();
+
+  try {
+    const decoded = verifyAccessToken(token);
+    const user = await User.findById(decoded.id);
+    if (user && user.isActive) req.user = user;
+  } catch {
+    // invalid/expired token on a public route — just proceed as a guest
+  }
+
+  next();
+});
+
+module.exports = { protect, optionalAuth, authorize, requireActiveMembership };

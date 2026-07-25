@@ -42,7 +42,10 @@ const NotificationBell = () => {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto glass-card p-3 z-50">
+        <div
+          className="fixed left-3 right-3 top-16 sm:absolute sm:left-auto sm:top-auto sm:right-0 sm:mt-2
+                     w-auto sm:w-80 max-h-[70vh] sm:max-h-96 overflow-y-auto glass-card p-3 z-50"
+        >
           <div className="flex items-center justify-between mb-2 px-1">
             <h3 className="font-semibold text-sm text-slate-700 dark:text-slate-200">নোটিফিকেশন</h3>
             {unreadCount > 0 && (

@@ -32,7 +32,7 @@ const NAV_ITEMS = [
   { to: '/dashboard/events', label: 'ইভেন্ট', icon: FiCalendar },
   { to: '/dashboard/meetings', label: 'মিটিং', icon: FiVideo },
   { to: '/dashboard/gallery', label: 'গ্যালারি', icon: FiImage },
-  { to: '/dashboard/blogs', label: 'ব্লগ', icon: FiFileText },
+  { to: '/blog', label: 'ব্লগ', icon: FiFileText },
   { to: '/dashboard/support', label: 'সাপোর্ট', icon: FiHelpCircle },
 ];
 

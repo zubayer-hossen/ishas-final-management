@@ -2,7 +2,7 @@ const express = require('express');
 const { param } = require('express-validator');
 const blogController = require('../controllers/blog.controller');
 const validate = require('../middleware/validate');
-const { protect, authorize } = require('../middleware/auth.middleware');
+const { protect, optionalAuth, authorize } = require('../middleware/auth.middleware');
 const { uploadImage } = require('../middleware/upload.middleware');
 const {
   mongoIdParam,
@@ -15,10 +15,12 @@ const router = express.Router();
 
 const STAFF_ROLES = ['owner', 'super_admin', 'admin', 'committee_member'];
 
-router.use(protect);
+// -------- Public reading (news-portal style — shareable links work for anyone) --------
+router.get('/', optionalAuth, blogController.getAllBlogs);
+router.get('/:slug', optionalAuth, blogController.getBlogBySlug);
 
-router.get('/', blogController.getAllBlogs);
-router.get('/:slug', blogController.getBlogBySlug);
+// -------- Everything below requires login --------
+router.use(protect);
 
 router.post(
   '/',

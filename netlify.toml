@@ -1,8 +1,14 @@
 [build]
+  # Front-end folder-er path
   base = "frontend"
+  
+  # Build command (Vite use korle 'npm run build', React use korle 'npm run build')
   command = "npm run build"
+  
+  # Build hoiya shob file kon folder-e jabe (Vite hole 'dist', Create-React-App hole 'build')
   publish = "dist"
 
+# React Router ba SPA-er Page Refresh (404 Error) Problem Handeling
 [[redirects]]
   from = "/*"
   to = "/index.html"

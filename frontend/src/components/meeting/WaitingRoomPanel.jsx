@@ -2,7 +2,7 @@ const WaitingRoomPanel = ({ waitingUsers, onAdmit, onReject }) => {
   if (!waitingUsers?.length) return null;
 
   return (
-    <div className="absolute top-4 right-4 w-72 glass-card p-4 z-20">
+    <div className="absolute top-3 left-3 right-3 sm:left-auto sm:right-4 sm:top-4 sm:w-72 w-auto glass-card p-4 z-20">
       <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-3">
         অপেক্ষমাণ ({waitingUsers.length})
       </p>
