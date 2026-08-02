@@ -17,7 +17,7 @@ const rejectMemberValidator = [mongoIdParam, body('reason').optional().trim().is
 
 const updateProfileValidator = [
   body('fullName').optional().trim().isLength({ max: 100 }),
-  body('phone').optional().trim().isMobilePhone('any').withMessage('সঠিক ফোন নম্বর দিন'),
+  body('phone').optional({ checkFalsy: true }).trim().isMobilePhone('any').withMessage('সঠিক ফোন নম্বর দিন'),
   body('bloodGroup').optional().trim(),
   body('dateOfBirth').optional().isISO8601().withMessage('সঠিক তারিখ দিন'),
   body('gender').optional().isIn(['male', 'female', 'other']),

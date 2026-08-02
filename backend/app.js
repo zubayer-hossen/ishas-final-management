@@ -22,6 +22,7 @@ const meetingRoutes = require('./routes/meeting.routes');
 const notificationRoutes = require('./routes/notification.routes');
 const supportRoutes = require('./routes/support.routes');
 const reportRoutes = require('./routes/report.routes');
+const bannerRoutes = require('./routes/banner.routes');
 
 const app = express();
 
@@ -61,6 +62,7 @@ app.use('/api/v1/meetings', meetingRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/support', supportRoutes);
 app.use('/api/v1/reports', reportRoutes);
+app.use('/api/v1/banners', bannerRoutes);
 
 // -------- 404 + Error Handler (must be last) --------
 app.use(notFound);

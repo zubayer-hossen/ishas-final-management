@@ -135,6 +135,7 @@ const swaggerSpec = {
     { name: 'Support', description: 'Tickets and FAQs' },
     { name: 'Notifications', description: 'In-app real-time notifications' },
     { name: 'Reports', description: 'PDF/Excel report generation' },
+    { name: 'Banners', description: 'Homepage hero slider banners (owner-managed)' },
   ],
   paths: {
     '/auth/register': { post: op('Register a new member', ['Auth'], { public: true, created: true }) },
@@ -265,6 +266,16 @@ const swaggerSpec = {
     '/reports/dues': { get: op('Dues report (PDF/Excel)', ['Reports']) },
     '/reports/events/{id}/attendance': { get: op('Event attendance report', ['Reports'], { params: [idParam] }) },
     '/reports/meetings/{id}/attendance': { get: op('Meeting attendance report', ['Reports'], { params: [idParam] }) },
+
+    '/banners': {
+      get: op('List active banners (homepage slider)', ['Banners'], { public: true }),
+      post: op('Create banner (owner only, multipart for image)', ['Banners'], { created: true }),
+    },
+    '/banners/admin': { get: op('List all banners including inactive (owner only)', ['Banners']) },
+    '/banners/{id}': {
+      patch: op('Update banner (owner only)', ['Banners'], { params: [idParam] }),
+      delete: op('Delete banner (owner only)', ['Banners'], { params: [idParam] }),
+    },
   },
 };
 

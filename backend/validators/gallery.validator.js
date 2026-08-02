@@ -11,7 +11,7 @@ const addVideoValidator = [
   mongoIdParam,
   body('url').trim().isURL().withMessage('সঠিক ভিডিও URL দিন'),
   body('title').optional().trim().isLength({ max: 150 }),
-  body('thumbnailUrl').optional().trim().isURL(),
+  body('thumbnailUrl').optional({ checkFalsy: true }).trim().isURL(),
 ];
 
 module.exports = { mongoIdParam, createAlbumValidator, addVideoValidator };

@@ -42,18 +42,20 @@ const clearCookieOptions = () => ({
 });
 
 /**
- * Sends an email but converts any SMTP/transport failure into a clear,
- * user-facing ApiError instead of letting it bubble up as an opaque 500.
- * The caller's DB changes (e.g. the created user, the OTP hash) are
- * already committed by this point, so the person can safely retry via
- * "resend OTP" once the SMTP issue is fixed.
+ * Sends an email but never lets a transport/SMTP failure block the
+ * caller's response. Some callers (like registration) have already
+ * committed an irreversible DB change by this point — throwing here
+ * would trap the person with a half-finished account and no way to
+ * retry. We log the failure server-side and let the person use
+ * "resend OTP" (or contact support) if the email never arrives.
  */
-const sendEmailSafely = async (options, failureMessage) => {
+const sendEmailSafely = async (options) => {
   try {
     await sendEmail(options);
+    return true;
   } catch (error) {
     logger.error(`Email send failed (${options.subject}) to ${options.to}: ${error.message}`);
-    throw ApiError.internal(failureMessage || 'ইমেইল পাঠাতে ব্যর্থ হয়েছে। একটু পর আবার চেষ্টা করুন।');
+    return false;
   }
 };
 
@@ -114,7 +116,7 @@ const register = asyncHandler(async (req, res) => {
     emailOtpExpires: new Date(Date.now() + env.otpExpiresMinutes * 60 * 1000),
   });
 
-  await sendEmailSafely({
+  const emailSent = await sendEmailSafely({
     to: user.email,
     subject: 'আপনার ইমেইল ভেরিফাই করুন — ISHAS Organization',
     html: otpEmail({ name: user.fullName, otp, minutes: env.otpExpiresMinutes }),
@@ -126,7 +128,9 @@ const register = asyncHandler(async (req, res) => {
       new ApiResponse(
         201,
         { email: user.email },
-        'রেজিস্ট্রেশন সফল হয়েছে। আপনার ইমেইলে পাঠানো OTP দিয়ে ভেরিফাই করুন।'
+        emailSent
+          ? 'রেজিস্ট্রেশন সফল হয়েছে। আপনার ইমেইলে পাঠানো OTP দিয়ে ভেরিফাই করুন।'
+          : 'রেজিস্ট্রেশন সফল হয়েছে, তবে OTP ইমেইল পাঠাতে সমস্যা হয়েছে। "আবার পাঠান" বাটনে চাপ দিন।'
       )
     );
 });
@@ -178,13 +182,21 @@ const resendOtp = asyncHandler(async (req, res) => {
   user.emailOtpExpires = new Date(Date.now() + env.otpExpiresMinutes * 60 * 1000);
   await user.save({ validateBeforeSave: false });
 
-  await sendEmailSafely({
+  const emailSent = await sendEmailSafely({
     to: user.email,
     subject: 'নতুন OTP কোড — ISHAS Organization',
     html: otpEmail({ name: user.fullName, otp, minutes: env.otpExpiresMinutes }),
   });
 
-  return res.status(200).json(new ApiResponse(200, null, 'নতুন OTP পাঠানো হয়েছে'));
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        null,
+        emailSent ? 'নতুন OTP পাঠানো হয়েছে' : 'OTP জেনারেট হয়েছে, তবে ইমেইল পাঠাতে সমস্যা হয়েছে। একটু পর আবার চেষ্টা করুন।'
+      )
+    );
 });
 
 /**

@@ -38,6 +38,7 @@ import GalleryManagementPage from '../pages/admin/GalleryManagementPage';
 import TicketManagementPage from '../pages/admin/TicketManagementPage';
 import ReportsPage from '../pages/admin/ReportsPage';
 import OrgSettingsPage from '../pages/admin/OrgSettingsPage';
+import BannerManagementPage from '../pages/admin/BannerManagementPage';
 import { ADMIN_ACCESS_ROLES, FINANCE_ROLES } from '../utils/roles';
 
 import NotFoundPage from '../pages/NotFoundPage';
@@ -107,6 +108,7 @@ const AppRoutes = () => (
 
         <Route element={<ProtectedRoute allowedRoles={['owner']} />}>
           <Route path="/dashboard/admin/settings" element={<OrgSettingsPage />} />
+          <Route path="/dashboard/admin/banners" element={<BannerManagementPage />} />
         </Route>
       </Route>
     </Route>

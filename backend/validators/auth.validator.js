@@ -3,7 +3,7 @@ const { body } = require('express-validator');
 const registerValidator = [
   body('fullName').trim().notEmpty().withMessage('নাম আবশ্যক').isLength({ max: 100 }),
   body('email').trim().isEmail().withMessage('সঠিক ইমেইল দিন').normalizeEmail(),
-  body('phone').optional().trim().isMobilePhone('any').withMessage('সঠিক ফোন নম্বর দিন'),
+  body('phone').optional({ checkFalsy: true }).trim().isMobilePhone('any').withMessage('সঠিক ফোন নম্বর দিন'),
   body('password')
     .isLength({ min: 8 })
     .withMessage('পাসওয়ার্ড কমপক্ষে ৮ ক্যারেক্টার হতে হবে')
