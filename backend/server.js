@@ -11,7 +11,7 @@ const socketAuthMiddleware = require('./middleware/socketAuth');
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: { origin: env.clientUrl, credentials: true },
+  cors: { origin: env.CLIENT_URL, credentials: true },
 });
 
 // Default namespace — used for real-time in-app notifications.
