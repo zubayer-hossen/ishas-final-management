@@ -6,6 +6,7 @@ import TextInput from '../../components/ui/TextInput';
 import PasswordInput from '../../components/ui/PasswordInput';
 import Button from '../../components/ui/Button';
 import { useRegisterMutation } from '../../features/auth/authApi';
+import useSlowRequestNotice from '../../hooks/useSlowRequestNotice';
 
 const RegisterPage = () => {
   const {
@@ -16,6 +17,7 @@ const RegisterPage = () => {
   } = useForm();
 
   const [registerUser, { isLoading }] = useRegisterMutation();
+  const showSlowNotice = useSlowRequestNotice(isLoading);
   const navigate = useNavigate();
   const password = watch('password');
 
@@ -25,7 +27,7 @@ const RegisterPage = () => {
       toast.success(result.message || 'রেজিস্ট্রেশন সফল হয়েছে');
       navigate(`/verify-otp?email=${encodeURIComponent(formData.email)}`);
     } catch (err) {
-      toast.error(err?.data?.message || 'রেজিস্ট্রেশন ব্যর্থ হয়েছে');
+      toast.error(err?.data?.message || 'রেজিস্ট্রেশন ব্যর্থ হয়েছে, ইন্টারনেট সংযোগ পরীক্ষা করে আবার চেষ্টা করুন');
     }
   };
 
@@ -82,6 +84,12 @@ const RegisterPage = () => {
         <Button type="submit" isLoading={isLoading} className="w-full">
           রেজিস্ট্রেশন করুন
         </Button>
+
+        {showSlowNotice && (
+          <p className="text-xs text-center text-slate-400 -mt-1">
+            সার্ভার প্রস্তুত হচ্ছে, একটু সময় লাগতে পারে…
+          </p>
+        )}
       </form>
 
       <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">

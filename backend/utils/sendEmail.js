@@ -15,6 +15,13 @@ const getTransporter = () => {
       user: env.smtp.user,
       pass: env.smtp.pass,
     },
+    // Cloud hosts (Render, etc.) occasionally have slow/blocked outbound
+    // paths to SMTP providers. Without explicit timeouts, a hung connection
+    // can block a "fire-and-forget" send indefinitely. These fail fast and
+    // log clearly instead.
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 15_000,
   });
 
   return transporter;

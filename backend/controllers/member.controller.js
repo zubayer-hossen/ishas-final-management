@@ -83,19 +83,17 @@ const approveMember = asyncHandler(async (req, res) => {
   member.approvedAt = new Date();
   await member.save({ validateBeforeSave: false });
 
-  try {
-    await sendEmail({
-      to: member.email,
-      subject: 'আপনার সদস্যপদ অনুমোদিত হয়েছে — ISHAS Organization',
-      html: membershipApprovedEmail({
-        name: member.fullName,
-        memberId: member.memberId,
-        loginUrl: `${env.clientUrl}/login`,
-      }),
-    });
-  } catch (error) {
+  sendEmail({
+    to: member.email,
+    subject: 'আপনার সদস্যপদ অনুমোদিত হয়েছে — ISHAS Organization',
+    html: membershipApprovedEmail({
+      name: member.fullName,
+      memberId: member.memberId,
+      loginUrl: `${env.clientUrl}/login`,
+    }),
+  }).catch((error) => {
     logger.error(`Approval email failed for ${member.email}: ${error.message}`);
-  }
+  });
 
   notifyUser(req.app.get('io'), member._id.toString(), {
     title: 'সদস্যপদ অনুমোদিত হয়েছে',

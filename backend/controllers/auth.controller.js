@@ -116,11 +116,11 @@ const register = asyncHandler(async (req, res) => {
     emailOtpExpires: new Date(Date.now() + env.otpExpiresMinutes * 60 * 1000),
   });
 
-  const emailSent = await sendEmailSafely({
+  sendEmailSafely({
     to: user.email,
     subject: 'আপনার ইমেইল ভেরিফাই করুন — ISHAS Organization',
     html: otpEmail({ name: user.fullName, otp, minutes: env.otpExpiresMinutes }),
-  });
+  }).catch(() => null); // fire-and-forget — never let a slow/failed SMTP connection delay this response
 
   return res
     .status(201)
@@ -128,9 +128,7 @@ const register = asyncHandler(async (req, res) => {
       new ApiResponse(
         201,
         { email: user.email },
-        emailSent
-          ? 'রেজিস্ট্রেশন সফল হয়েছে। আপনার ইমেইলে পাঠানো OTP দিয়ে ভেরিফাই করুন।'
-          : 'রেজিস্ট্রেশন সফল হয়েছে, তবে OTP ইমেইল পাঠাতে সমস্যা হয়েছে। "আবার পাঠান" বাটনে চাপ দিন।'
+        'রেজিস্ট্রেশন সফল হয়েছে। আপনার ইমেইলে পাঠানো OTP দিয়ে ভেরিফাই করুন। কিছুক্ষণের মধ্যে ইমেইল না পেলে "আবার পাঠান" চাপুন।'
       )
     );
 });
@@ -182,20 +180,16 @@ const resendOtp = asyncHandler(async (req, res) => {
   user.emailOtpExpires = new Date(Date.now() + env.otpExpiresMinutes * 60 * 1000);
   await user.save({ validateBeforeSave: false });
 
-  const emailSent = await sendEmailSafely({
+  sendEmailSafely({
     to: user.email,
     subject: 'নতুন OTP কোড — ISHAS Organization',
     html: otpEmail({ name: user.fullName, otp, minutes: env.otpExpiresMinutes }),
-  });
+  }).catch(() => null);
 
   return res
     .status(200)
     .json(
-      new ApiResponse(
-        200,
-        null,
-        emailSent ? 'নতুন OTP পাঠানো হয়েছে' : 'OTP জেনারেট হয়েছে, তবে ইমেইল পাঠাতে সমস্যা হয়েছে। একটু পর আবার চেষ্টা করুন।'
-      )
+      new ApiResponse(200, null, 'নতুন OTP পাঠানো হয়েছে। কিছুক্ষণের মধ্যে না পেলে আবার চেষ্টা করুন।')
     );
 });
 
@@ -354,15 +348,13 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
   const resetUrl = `${env.clientUrl}/reset-password?token=${rawToken}&email=${encodeURIComponent(email)}`;
 
-  try {
-    await sendEmail({
-      to: user.email,
-      subject: 'পাসওয়ার্ড রিসেট অনুরোধ — ISHAS Organization',
-      html: resetPasswordEmail({ name: user.fullName, resetUrl, minutes: env.otpExpiresMinutes }),
-    });
-  } catch (error) {
+  sendEmail({
+    to: user.email,
+    subject: 'পাসওয়ার্ড রিসেট অনুরোধ — ISHAS Organization',
+    html: resetPasswordEmail({ name: user.fullName, resetUrl, minutes: env.otpExpiresMinutes }),
+  }).catch((error) => {
     logger.error(`Password reset email failed for ${user.email}: ${error.message}`);
-  }
+  });
 
   return res.status(200).json(genericResponse);
 });

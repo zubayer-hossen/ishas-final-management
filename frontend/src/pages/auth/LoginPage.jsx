@@ -8,6 +8,7 @@ import Button from '../../components/ui/Button';
 import { useLoginMutation } from '../../features/auth/authApi';
 import { useAppDispatch } from '../../app/hooks';
 import { setCredentials } from '../../features/auth/authSlice';
+import useSlowRequestNotice from '../../hooks/useSlowRequestNotice';
 
 const LoginPage = () => {
   const {
@@ -17,6 +18,7 @@ const LoginPage = () => {
   } = useForm();
 
   const [login, { isLoading }] = useLoginMutation();
+  const showSlowNotice = useSlowRequestNotice(isLoading);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -71,6 +73,12 @@ const LoginPage = () => {
         <Button type="submit" isLoading={isLoading} className="w-full">
           লগইন করুন
         </Button>
+
+        {showSlowNotice && (
+          <p className="text-xs text-center text-slate-400 -mt-1">
+            সার্ভার প্রস্তুত হচ্ছে, একটু সময় লাগতে পারে…
+          </p>
+        )}
       </form>
 
       <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
