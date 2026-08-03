@@ -10,8 +10,25 @@ const socketAuthMiddleware = require('./middleware/socketAuth');
 
 const server = http.createServer(app);
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://ishasor.netlify.app",
+];
+
 const io = new Server(server, {
-  cors: { origin: env.clientUrl, credentials: true },
+  cors: {
+    origin(origin, callback) {
+      // Postman বা server-to-server request-এর জন্য
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  },
 });
 
 // Default namespace — used for real-time in-app notifications.
