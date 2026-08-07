@@ -34,6 +34,7 @@ app.use(cookieParser());
 if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev', { stream: { write: (msg) => logger.debug(msg.trim()) } }));
 }
+app.set("trust proxy", 1);
 
 // -------- Security --------
 applySecurityMiddleware(app);

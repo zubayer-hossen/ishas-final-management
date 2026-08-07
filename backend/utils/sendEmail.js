@@ -1,29 +1,40 @@
-const nodemailer = require("nodemailer");
+const brevo = require("@getbrevo/brevo");
 const env = require("../config/env");
 const logger = require("./logger");
 
-const transporter = nodemailer.createTransport({
-  host: env.smtp.host,
-  port: env.smtp.port,
-  secure: false,
-  auth: {
-    user: env.smtp.user,
-    pass: env.smtp.pass,
-  },
-});
+const apiInstance = new brevo.TransactionalEmailsApi();
+
+apiInstance.setApiKey(
+  brevo.TransactionalEmailsApiApiKeys.apiKey,
+  env.brevo.apiKey
+);
 
 const sendEmail = async ({ to, subject, html }) => {
   try {
-    await transporter.sendMail({
-      from: `${env.smtp.fromName} <${env.smtp.fromAddress}>`,
-      to,
-      subject,
-      html,
-    });
+    const email = new brevo.SendSmtpEmail();
+
+    email.sender = {
+      name: env.email.fromName,
+      email: env.email.fromAddress,
+    };
+
+    email.to = [{ email: to }];
+
+    email.subject = subject;
+    email.htmlContent = html;
+
+    const response = await apiInstance.sendTransacEmail(email);
 
     logger.info(`Email sent successfully -> ${to}`);
+    return response;
+
   } catch (err) {
-    logger.error(`Email sending failed -> ${to}: ${err.message}`);
+    console.error(err);
+
+    logger.error(
+      `Email sending failed -> ${to}: ${err.message}`
+    );
+
     throw err;
   }
 };

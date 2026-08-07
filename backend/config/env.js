@@ -45,14 +45,14 @@ module.exports = {
 
   cookieSecret: process.env.COOKIE_SECRET,
 
-  smtp: {
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT) || 587,
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-    fromName: process.env.EMAIL_FROM_NAME || 'ISHAS Organization',
+brevo: {
+    apiKey: process.env.BREVO_API_KEY,
+},
+
+email: {
+    fromName: process.env.EMAIL_FROM_NAME,
     fromAddress: process.env.EMAIL_FROM_ADDRESS,
-  },
+},
  
 
   otpExpiresMinutes: Number(process.env.OTP_EXPIRES_MINUTES) || 10,
