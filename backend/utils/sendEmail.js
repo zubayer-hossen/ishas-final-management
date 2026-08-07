@@ -1,38 +1,50 @@
-const brevo = require("@getbrevo/brevo");
+const axios = require("axios");
 const env = require("../config/env");
 const logger = require("./logger");
 
-const apiInstance = new brevo.TransactionalEmailsApi();
-
-apiInstance.setApiKey(
-  brevo.TransactionalEmailsApiApiKeys.apiKey,
-  env.brevo.apiKey
-);
-
 const sendEmail = async ({ to, subject, html }) => {
   try {
-    const email = new brevo.SendSmtpEmail();
+    const response = await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        sender: {
+          name: env.email.fromName,
+          email: env.email.fromAddress,
+        },
 
-    email.sender = {
-      name: env.email.fromName,
-      email: env.email.fromAddress,
-    };
+        to: [
+          {
+            email: to,
+          },
+        ],
 
-    email.to = [{ email: to }];
+        subject,
 
-    email.subject = subject;
-    email.htmlContent = html;
+        htmlContent: html,
+      },
+      {
+        headers: {
+          "api-key": env.brevo.apiKey,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
 
-    const response = await apiInstance.sendTransacEmail(email);
+        timeout: 30000,
+      }
+    );
 
     logger.info(`Email sent successfully -> ${to}`);
-    return response;
 
+    return response.data;
   } catch (err) {
-    console.error(err);
+    console.error(
+      err.response?.data || err.message
+    );
 
     logger.error(
-      `Email sending failed -> ${to}: ${err.message}`
+      `Email sending failed -> ${to}: ${
+        err.response?.data?.message || err.message
+      }`
     );
 
     throw err;
