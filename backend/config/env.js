@@ -53,9 +53,7 @@ module.exports = {
     fromName: process.env.EMAIL_FROM_NAME || 'ISHAS Organization',
     fromAddress: process.env.EMAIL_FROM_ADDRESS,
   },
-  resend: {
-  apiKey: process.env.RESEND_API_KEY,
-},
+ 
 
   otpExpiresMinutes: Number(process.env.OTP_EXPIRES_MINUTES) || 10,
 

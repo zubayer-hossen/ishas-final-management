@@ -1,31 +1,29 @@
-const { Resend } = require("resend");
+const nodemailer = require("nodemailer");
 const env = require("../config/env");
 const logger = require("./logger");
 
-const resend = new Resend(env.resend.apiKey);
+const transporter = nodemailer.createTransport({
+  host: env.smtp.host,
+  port: env.smtp.port,
+  secure: false,
+  auth: {
+    user: env.smtp.user,
+    pass: env.smtp.pass,
+  },
+});
 
 const sendEmail = async ({ to, subject, html }) => {
   try {
-    const { data, error } = await resend.emails.send({
+    await transporter.sendMail({
       from: `${env.smtp.fromName} <${env.smtp.fromAddress}>`,
       to,
       subject,
       html,
     });
 
-    if (error) {
-      console.error(error);
-      throw new Error(error.message);
-    }
-
     logger.info(`Email sent successfully -> ${to}`);
-
-    return data;
   } catch (err) {
-    console.error(err);
-
     logger.error(`Email sending failed -> ${to}: ${err.message}`);
-
     throw err;
   }
 };
